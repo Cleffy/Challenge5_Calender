@@ -4,15 +4,16 @@
 
 
 class TimeBlock{
-  constructor(day, hour, event){
-    this.day = day;
+  constructor(hour, event){
     this.hour = hour;
     this.event = event;
   }
 }
 var currentDate = dayjs();
 var schedule = [];
+schedule[0] = new TimeBlock(9, "beep");
 updateDate();
+createTimeBlock(0);
 $(function () {
   // TODO: Add a listener for click events on the save button. This code should
   // use the id in the containing time-block as a key to save the user input in
@@ -35,8 +36,24 @@ $(function () {
 });
 
 
-function createTimeBlock(){
-
+function createTimeBlock(index){
+  let timeBlockHTML = "<div id=\"hour-"+ schedule[index].hour +"\" class=\"row time-block ";
+  if(schedule[index].hour < currentDate.hour()){
+    timeBlockHTML += "past\">";
+  }
+  else if(schedule[index].hour == currentDate.hour()){
+    timeBlockHTML += "present\">";
+  }
+  else{
+    timeBlockHTML += "future\">";
+  }
+  timeBlockHTML += "<div class=\"col-2 col-md-1 hour text-center py-3\">" + dayjs().hour(schedule[index].hour).format('h A') + "</div>";
+  timeBlockHTML += "<textarea class=\"col-8 col-md-10 description\" rows=\"3\">" + schedule[index].event + "</textarea>";
+  timeBlockHTML += "<button class=\"btn saveBtn col-2 col-md-1\" aria-label=\"save\">";
+  timeBlockHTML += "<i class=\"fas fa-save\" aria-hidden=\"true\"></i>";
+  timeBlockHTML += "</button>";
+  timeBlockHTML += "</div>";
+  $("#schedule").append(timeBlockHTML);
 }
 function updateDate(){
   currentDate = dayjs();
