@@ -1,44 +1,45 @@
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
-
-
+//Class that holds the hour block and whatever is scheduled.
 class TimeBlock{
   constructor(hour, event){
     this.hour = hour;
     this.event = event;
   }
 }
-var currentDate = dayjs();
-var businessStart = 9;
-var businessEnd = 17;
-var schedule = [];
+var currentDate = dayjs();  //Current date
+var businessStart = 9;      //Starting hour on a 24-hour scale
+var businessEnd = 17;       //Ending hour on a 24-hour scale
+var schedule = [];          //An array of TimeBlocks
+
+//Initializes the website
 updateDate();
 buildSchedule();
 buildPlanner();
 
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
+// Events
+/*
+  saveBtn
+  Saves whatever is in the corresponding text field into local storage when it's clicked
+*/
 $(".saveBtn").on("click", function () {
   var parentEl = $(this).parent();
   var hour = parentEl.data("hour");
   var event = parentEl.children("textarea").val();
   saveEvent(hour, event);
 });
-
+/*
+  clearBtn
+  Clears whatever is in local storage related to this page when it's clicked
+*/
 $(".clearBtn").on("click", function() {
   clearSchedule();
 });
 
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
+// Functions that add HTML elements to the page.
+/*
+  createTimeBlock(index)
+  index: The current TimeBlock being worked on.
+  Builds the HTML of a single TimeBlock
+*/
 function createTimeBlock(index){
   var timeBlockHTML = "<div data-hour=\""+ schedule[index].hour +"\" id=\"hour-"+ schedule[index].hour +"\" class=\"row time-block ";
   if(schedule[index].hour < currentDate.hour()){
@@ -58,25 +59,50 @@ function createTimeBlock(index){
   timeBlockHTML += "</div>";
   $("#schedule").append(timeBlockHTML);
 }
+/*
+  createClearButton()
+  Builds the HTML for a clearButton.
+*/
 function createClearButton(){
-  var clearBtn = "<button class=\"btn clearBtn col-12 col-md-12\" aria-label=\"save\">Clear Schedule</button>";
+  var clearBtn = "<div class=\"row\">";
+  clearBtn += "<div class=\"col-2 col-md-1 py-3\"></div>";
+  clearBtn += "<button class=\"btn clearBtn col-8 col-md-10\" rows=\"3\" aria-label=\"clear\">Clear Schedule</button>";
+  clearBtn += "<div class=\"col-2 col-md-1\"></div></div>";
   $("#schedule").append(clearBtn);
 }
-  // TODO: Add code to display the current date in the header of the page.
+
+
+// Functions that update the HTML elements on page load and if something happens.
+/*
+  updateDate()
+  Updates the date field to what the current date and time are.
+*/
 function updateDate(){
   currentDate = dayjs();
   $("#currentDay").text(currentDate.format("dddd, MMMM D, YYYY h:mm A"));
 }
+/*
+  buildSchedule()
+  Creates the TimeBlocks within schedule depending on what is in local storage.
+*/
 function buildSchedule(){
   for(let index = 0; index <= businessEnd-businessStart; index++){
     schedule[index] = new TimeBlock(index+businessStart,getEvent(index+businessStart));
   }
 }
+/*
+  updateSchedule()
+  Updates the TimeBlocks within schedule depending on what is currently in local storage.
+*/
 function updateSchedule(){
   for(let index = 0; index <= businessEnd-businessStart; index++){
     schedule[index].event = getEvent(index+businessStart);
   }
 }
+/*
+  clearSchedule()
+  Clears whatever is stored in local storage.
+*/
 function clearSchedule(){
   for(let index = 0; index < schedule.length; index++){
     clearEvent(schedule[index].hour);
@@ -84,31 +110,62 @@ function clearSchedule(){
   updateSchedule();
   updatePlanner();
 }
+/*
+  buildPlanner()
+  Creates the HTML elements of the planner.
+*/
 function buildPlanner(){
   for(let index = 0; index < schedule.length; index++){
     createTimeBlock(index);
   }
   createClearButton();
 }
+/*
+  updatePlanner()
+  Updates the textFields within a specific hour.
+*/
 function updatePlanner(){
   for(let index = 0; index < schedule.length; index++){
     $("#hour-" + schedule[index].hour.toString()).children("textarea").val(schedule[index].event);
   }
 }
 
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
+// Functions that deal with the text area of the scheduler. 
+/*
+  getEvent(hour)
+  hour - an hour on the 24 hour timescale
+  fetch whatever is stored in the local storage for a certain hour.
+  If there is nothing there, then return an empty string.
+  If it's from an earlier day, clear the contents then return an empty string.
+  Otherwise return whatever was stored.
+*/
 function getEvent(hour){
-  var event = localStorage.getItem("timeBlock-" + hour.toString());
+  var event = JSON.parse(localStorage.getItem("timeBlock-" + hour.toString()));
   if(event === null){
-    event = "";
+    return "";
   }
-  return event;
+  if(event[0] != currentDate.format("MM/DD/YYYY")){
+    clearEvent(hour);
+    return "";
+  }
+  return event[1];
 }
+/*
+  saveEvent(hour, event)
+  hour - an hour on the 24 hour timescale
+  event - something saved to the schedule
+  An array with the current date, and whatever is to be stored
+  Stores the array for the certain hour.
+*/
 function saveEvent(hour, event){
-  localStorage.setItem("timeBlock-" + hour.toString(), event);
+  var eventData = [currentDate.format("MM/DD/YYYY"), event];
+  localStorage.setItem("timeBlock-" + hour.toString(), JSON.stringify(eventData));
 }
+/*
+  clearEvent(hour)
+  hour - an hour on the 24 hour timescale
+  Clears whatever is stored at a certain hour.
+*/
 function clearEvent(hour){
   localStorage.removeItem("timeBlock-" + hour.toString());
 }
