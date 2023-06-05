@@ -1,4 +1,4 @@
-# Challenge5_Calender
+# Challenge5_Calendar
 
 ## Description
 A simple planner for the day. It allows the user to input a plan during an hour block and save it to their local storage.
