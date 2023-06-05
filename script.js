@@ -5,10 +5,11 @@ class TimeBlock{
     this.event = event;
   }
 }
-var currentDate = dayjs();  //Current date
-var businessStart = 9;      //Starting hour on a 24-hour scale
-var businessEnd = 17;       //Ending hour on a 24-hour scale
-var schedule = [];          //An array of TimeBlocks
+var currentDate = dayjs();          //Current date
+var timer = dayjs().second();       //Gets current seconds to update time
+var businessStart = 9;              //Starting hour on a 24-hour scale
+var businessEnd = 22;               //Ending hour on a 24-hour scale
+var schedule = [];                  //An array of TimeBlocks
 
 //Initializes the website
 updateDate();
@@ -33,6 +34,17 @@ $(".saveBtn").on("click", function () {
 $(".clearBtn").on("click", function() {
   clearSchedule();
 });
+
+/*
+  Interval updates the time
+*/
+setInterval(function() {
+  timer++;
+  if(timer >= 60){
+    timer = 0;
+    updateDate();
+  }
+}, 1000);
 
 // Functions that add HTML elements to the page.
 /*
