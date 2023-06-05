@@ -17,6 +17,10 @@ updateDate();
 buildSchedule();
 buildPlanner();
 $(".saveBtn").on("click", function () {
+  var parentEl = $(this).parent();
+  var hour = parentEl.data("hour");
+  var text = parentEl.children("textarea").val();
+  saveEvent(hour, text);
   // TODO: Add a listener for click events on the save button. This code should
   // use the id in the containing time-block as a key to save the user input in
   // local storage. HINT: What does `this` reference in the click listener
@@ -39,7 +43,7 @@ $(".saveBtn").on("click", function () {
 
 
 function createTimeBlock(index){
-  let timeBlockHTML = "<div id=\"hour-"+ schedule[index].hour +"\" class=\"row time-block ";
+  let timeBlockHTML = "<div data-hour=\""+ schedule[index].hour +"\" id=\"hour-"+ schedule[index].hour +"\" class=\"row time-block ";
   if(schedule[index].hour < currentDate.hour()){
     timeBlockHTML += "past\">";
   }
