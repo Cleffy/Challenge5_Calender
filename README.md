@@ -12,7 +12,7 @@ If they refresh the page, the current hour block will be in red, the previuous b
 The date and time at the top of the page refreshes every minute.
 
 ## Credits
-Base code provided by edX for use during University of Berkely Full-stack Developer Bootcamp - 2023
+Base code provided by edX for use during University of California, Berkeley: Full-stack Developer Bootcamp - 2023
 
 Day.js Reference Library https://day.js.org/  
 JQuery Reference Library https://api.jquery.com/
