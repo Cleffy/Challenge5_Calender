@@ -10,11 +10,13 @@ class TimeBlock{
   }
 }
 var currentDate = dayjs();
+var businessStart = 9;
+var businessEnd = 17;
 var schedule = [];
-schedule[0] = new TimeBlock(9, "beep");
 updateDate();
-createTimeBlock(0);
-$(function () {
+buildSchedule();
+buildPlanner();
+$(".saveBtn").on("click", function () {
   // TODO: Add a listener for click events on the save button. This code should
   // use the id in the containing time-block as a key to save the user input in
   // local storage. HINT: What does `this` reference in the click listener
@@ -59,9 +61,26 @@ function updateDate(){
   currentDate = dayjs();
   $("#currentDay").text(currentDate.format("dddd, MMMM D, YYYY h:mm A"));
 }
-function buildPlanner(){
-
+function buildSchedule(){
+  for(let index = 0; index <= businessEnd-businessStart; index++){
+    schedule[index] = new TimeBlock(index+businessStart,getEvent(index+businessStart));
+  }
 }
-function saveEvent(){
-
+function buildPlanner(){
+  for(let index = 0; index < schedule.length; index++){
+    createTimeBlock(index);
+  }
+}
+function getEvent(hour){
+  var event = localStorage.getItem("timeBlock-" + hour.toString());
+  if(event === null){
+    event = "";
+  }
+  return event;
+}
+function saveEvent(hour, event){
+  localStorage.setItem("timeBlock-" + hour.toString(), event);
+}
+function clearEvent(hour){
+  localStorage.removeItem("timeBlock-" + hour.toString());
 }
